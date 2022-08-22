@@ -5,15 +5,13 @@
 
 typedef struct Node Node;
 
-struct Node 
-{
+struct Node {
   void *data;
   Node *next;
   Node *prev;
 };
 
-struct List 
-{
+struct List {
   Node *head;
   Node *tail;
   Node *current;
@@ -21,7 +19,8 @@ struct List
 
 typedef List List;
 
-Node *createNode(void *data) {
+Node *createNode(void *data) 
+{
   Node *new = (Node *)malloc(sizeof(Node));
   assert(new != NULL);
   new->data = data;
@@ -39,48 +38,130 @@ List *createList()
 }
 
 void *firstList(List *list)
-{ 
-  if(!list->head) return NULL;
+{
+  if (!list->head) return NULL;
   list->current = list->head;
-  return (list-> head->data);
+  return (list->head->data);
 }
 
 void *nextList(List *list) 
+{
+  if(  !list->current || !list->current->next)
+  { 
+    return NULL;
+  }
+  list->current=list->current->next;
+  return(list->current->data);
+}
+
+void *lastList(List *list) 
 { 
-  if(!list->head) return NULL;
-  list->current = list->next;
-  return (list-> current);
+  if(!list->tail)
+  {
+    return NULL;
+  }
+  list->current=list->tail;
+  return(list->tail->data);
 }
 
-void *lastList(List *list) { return NULL; }
+void *prevList(List *list) 
+{ 
+  if(!list->current || !list->current->prev){ 
+    return NULL;
+  }
+  list->current=list->current->prev;
+  return(list->current->data);
+}
 
-void *prevList(List *list) { return NULL; }
+void pushFront(List *list, void *data) 
+{
+  Node* n = createNode(data);
+  n->next= list->head;
+  if(list->head==NULL){
+    list->head = n;  
+    list->tail=n;
+  }
+  else{
+    list->head->prev=n;
+  }
+  list->head = n;
+  n->prev=NULL;
+}
 
-void pushFront(List *list, void *data) {}
 
-void pushBack(List *list, void *data) {
+void pushBack(List *list, void *data) 
+{
   list->current = list->tail;
-  pushCurrent(list, data);
+    pushCurrent(list,data);
 }
 
-void pushCurrent(List *list, void *data) {}
-
-void *popFront(List *list) {
-  list->current = list->head;
-  return popCurrent(list);
+void pushCurrent(List *list, void *data) 
+{
+  Node* n = createNode(data);
+  if(list->head==NULL)
+  {
+    list->head=n;
+    list->tail=n;
+  }
+  else{
+    if(list->tail == list->current){
+      list->tail=n;
+      list->current->next=n;
+      n->prev=list->current;
+    }
+    else{
+      list->current->next->prev=n;
+      n->prev=list->current;
+      n->next=list->current->next;
+      list->current->next=n;
+    }
+  }
 }
 
-void *popBack(List *list) {
+void *popFront(List *list) 
+{
+ list->current = list->head;
+    return popCurrent(list);
+}
+
+void *popBack(List *list) 
+{
   list->current = list->tail;
-  return popCurrent(list);
+    return popCurrent(list);
 }
 
-void *popCurrent(List *list) { return NULL; }
+void *popCurrent(List *list) 
+{
+  Node* eliminado=list->current;
+  void* data=list->current->data;
+  
+  if(list->head != list->current && list->tail != list->current )
+  {
+    list->current->prev->next=list->current->next;
+    list->current->next->prev=list->current->prev;
+    list->current=list->current->next; 
+  }
+  else{
+    if(list->current==list->head)
+    {
+      list->current->next->prev = NULL;
+      list->current = list->current->next;
+      list->head = list->current;         
+    }
+    else
+    {
+      list->current->prev->next = NULL;
+      list->current = list->current->prev;
+      list->tail = list->current;    
+    } 
+  }
+  free(eliminado);
+  return data; 
+}
 
 void cleanList(List *list) 
 {
-  while (list->head != NULL) 
-  {
+  while (list->head != NULL) {
     popFront(list);
   }
 }
