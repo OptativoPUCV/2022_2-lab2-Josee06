@@ -1,0 +1,8 @@
+Mon 22 Aug 2022 03:50:55 AM UTC: 
+In file included from test.c:5:
+list.c: In function ‘nextList’:
+list.c:51:23: error: ‘List’ {aka ‘struct List’} has no member named ‘next’
+   51 |   list->current = list->next;
+      |                       ^~
+Compilation failed
+2f9b155
